@@ -32,8 +32,9 @@ export default function AuthProvider({ children }) {
       .select("id, nombre, rol")
       .eq("id", userId)
       .single()
-      .then(({ data }) => {
-        if (!cancelado) setPerfil(data);
+      .then(({ data, error }) => {
+        if (cancelado) return;
+        setPerfil(error || !data ? {id: userId, nombre: null, rol: null} : data);
       });
 
     return () => {
@@ -43,13 +44,14 @@ export default function AuthProvider({ children }) {
 
   // Solo usamos el perfil si corresponde al usuario actual
   const perfilActual = user && perfil?.id === user.id ? perfil : null;
-
+  const cargandoPerfil = !! user && perfilActual === null;
   const valor = {
+    cargandoPerfil,
+    cargando,
     session,
     user,
     perfil: perfilActual,
     esAdmin: perfilActual?.rol === "admin",
-    cargando,
     cerrarSesion: () => supabase.auth.signOut(),
   };
 
