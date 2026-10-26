@@ -42,3 +42,23 @@ export function urlFoto(fotoPath) {
   return supabase.storage.from("fotos-reportes").getPublicUrl(fotoPath).data
     .publicUrl;
 }
+
+// Lista de estados en orden, para los <select> del panel
+export const LISTA_ESTADOS = Object.keys(ESTADOS);
+
+// Todos los reportes, los más recientes primero. Si se pasa estado, se filtra.
+export function cargarReportesAdmin(estado) {
+  let consulta = supabase
+    .from("reportes")
+    .select(COLUMNAS_REPORTE)
+    .order("created_at", { ascending: false });
+  if (estado) consulta = consulta.eq("estado", estado);
+  return consulta;
+}
+
+// El trigger en la base de datos cambia el estado del reporte
+export function publicarActualizacion(reporteId, estado, comentario) {
+  return supabase
+    .from("actualizaciones")
+    .insert({ reporte_id: reporteId, estado, comentario: comentario || null });
+}

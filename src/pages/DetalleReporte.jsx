@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router";
 import { ArrowLeft, LoaderCircle, MapPin } from "lucide-react";
 
+import FormularioActualizacion from "../components/FormularioActualizacion";
+import { useAuth } from "../context/useAuth";
 import { cargarReporte, infoEstado, urlFoto } from "../lib/reportes";
 
 function Etiqueta({ estado }) {
@@ -37,6 +39,9 @@ export default function DetalleReporte() {
   // undefined = cargando, null = no existe
   const [reporte, setReporte] = useState(undefined);
   const [error, setError] = useState(false);
+  // Se incrementa tras publicar una actualización para volver a cargar el reporte
+  const [version, setVersion] = useState(0);
+  const { esAdmin } = useAuth();
 
   useEffect(() => {
     let cancelado = false;
@@ -53,7 +58,7 @@ export default function DetalleReporte() {
     return () => {
       cancelado = true;
     };
-  }, [id]);
+  }, [id, version]);
 
   if (error) return <Mensaje>No se pudo cargar el reporte.</Mensaje>;
   if (reporte === undefined) {
@@ -139,6 +144,13 @@ export default function DetalleReporte() {
               ))}
             </ol>
           </section>
+
+          {esAdmin && (
+            <FormularioActualizacion
+              reporte={reporte}
+              onPublicado={() => setVersion((v) => v + 1)}
+            />
+          )}
         </article>
       </div>
     </div>
