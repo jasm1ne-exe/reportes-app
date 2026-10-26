@@ -1,12 +1,14 @@
 import { Route, Routes } from "react-router";
 
 import Encabezado from "./components/encabezado";
+import RutaAdmin from "./components/RutaAdmin";
 import Inicio from "./pages/Inicio";
 import Login from "./pages/Login";
 import Registro from "./pages/Registro";
 import RecuperarContrasena from "./pages/RecuperarContrasena";
 import NuevaContrasena from "./pages/NuevaContrasena";
 import DetalleReporte from "./pages/DetalleReporte";
+import Admin from "./pages/Admin";
 
 export default function App() {
   return (
@@ -22,6 +24,7 @@ export default function App() {
           <Route path="/recuperar" element={<RecuperarContrasena />} />
           <Route path="/nueva-contrasena" element={<NuevaContrasena />} />
           <Route path="/reporte/:id" element={<DetalleReporte />} />
+          <Route path="/admin" element={<RutaAdmin><Admin /></RutaAdmin>} />
         </Routes>
       </main>
     </div>
