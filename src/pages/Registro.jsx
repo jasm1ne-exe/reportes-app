@@ -36,7 +36,7 @@ export default function Registro() {
       password,
       options: {
         data: { nombre: nombre.trim() },
-        emailRedirectTo: window.location.origin,
+        emailRedirectTo: window.location.origin + import.meta.env.BASE_URL,
       },
     });
 
