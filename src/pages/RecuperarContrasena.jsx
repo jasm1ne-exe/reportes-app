@@ -18,7 +18,7 @@ export default function RecuperarContrasena() {
     setEnviando(true);
 
     const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
-      redirectTo: `${window.location.origin}/nueva-contrasena`,
+      redirectTo: `${window.location.origin}${import.meta.env.BASE_URL}nueva-contrasena`,
     });
 
     setEnviando(false);
