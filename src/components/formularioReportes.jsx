@@ -126,28 +126,45 @@ export default function FormularioReporte({
     // estado, usuario_id y fechas los llena el trigger de la base de datos.
     // Si este insert falla, la foto ya subida queda huérfana: los usuarios
     // anónimos no pueden borrar del bucket (solo los admins).
-    // .select() devuelve la fila guardada para dibujar su marcador sin recargar
-    const { data, error } = await supabase
-      .from("reportes")
-      .insert({
-        titulo: tituloLimpio,
-        descripcion: descripcion.trim(),
-        categoria_id: Number(categoriaElegida),
-        // PostGIS espera primero la longitud y luego la latitud
-        ubicacion: `SRID=4326;POINT(${position[1]} ${position[0]})`,
-        foto_path: fotoPath,
-      })
-      .select(COLUMNAS_REPORTE)
-      .single();
-
-    setEnviando(false);
+    // El id se crea aquí porque los anónimos no pueden leer la tabla
+    // reportes, así que el insert no puede devolver la fila guardada.
+    const id = crypto.randomUUID();
+    const { error } = await supabase.from("reportes").insert({
+      id,
+      titulo: tituloLimpio,
+      descripcion: descripcion.trim(),
+      categoria_id: Number(categoriaElegida),
+      // PostGIS espera primero la longitud y luego la latitud
+      ubicacion: `SRID=4326;POINT(${position[1]} ${position[0]})`,
+      foto_path: fotoPath,
+    });
 
     if (error) {
       console.error(error);
+      setEnviando(false);
       setAlerta({
         tipo: "error",
         mensaje: "No se pudo enviar el reporte. Intenta de nuevo.",
       });
+      return;
+    }
+
+    // Se lee de la vista pública para dibujar el marcador igual que lo verán
+    // los demás (ubicación aproximada y sin foto hasta que se revise)
+    const { data } = await supabase
+      .from("reportes_publicos")
+      .select(COLUMNAS_REPORTE)
+      .eq("id", id)
+      .maybeSingle();
+
+    setEnviando(false);
+
+    // El reporte ya se guardó; si no se pudo leer, solo no se dibuja el marcador
+    if (!data) {
+      onCerrar?.();
+      setTitulo("");
+      setDescripcion("");
+      setFoto(null);
       return;
     }
 
@@ -262,6 +279,9 @@ export default function FormularioReporte({
               />
             </label>
           )}
+          <p className="text-xs text-slate-500">
+            La foto se mostrará en el mapa cuando el municipio revise el reporte.
+          </p>
 
           {aviso && (
             <div

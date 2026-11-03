@@ -17,8 +17,7 @@ import "leaflet/dist/leaflet.css";
 import FormularioReporte from "./formularioReportes";
 import MarcadorReporte from "./MarcadorReporte";
 import FiltroCategorias from "./FiltroCategorias";
-import { supabase } from "../lib/supabaseClient";
-import { COLUMNAS_REPORTE, cargarCategorias } from "../lib/reportes";
+import { cargarCategorias, cargarReportesMapa } from "../lib/reportes";
 
 // Coordenadas de magdalena, Jalisco, México. Se usan mientras llega la ubicacion real o si falla.
 const DEFAULT_POSITION = [20.9086744, -103.9815141];
@@ -123,12 +122,7 @@ export default function MapView() {
   useEffect(() => {
     let cancelado = false;
 
-    supabase
-      .from("reportes")
-      .select(COLUMNAS_REPORTE)
-      .order("created_at", { ascending: false })
-      .limit(500)
-      .then(({ data, error }) => {
+    cargarReportesMapa().then(({ data, error }) => {
         if (cancelado) return;
         if (error) {
           console.error(error);
