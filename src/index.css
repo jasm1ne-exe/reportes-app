@@ -2,11 +2,13 @@
 
 /* Colores propios de la app. Tailwind genera utilidades como bg-marca-600 o text-marca-700. */
 @theme {
-  --color-marca-50: #eff6ff;
-  --color-marca-100: #dbeafe;
-  --color-marca-500: #3b82f6;
-  --color-marca-600: #2563eb;
-  --color-marca-700: #1d4ed8;
+  --color-marca-50: #eef2ff;
+  --color-marca-100: #dbe4fe;
+  --color-marca-500: #3056d3;
+  --color-marca-600: #1e3fae;
+  --color-marca-700: #172f85;
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+
 }
 
 /* Estilos base mínimos; todo lo demás se hace con utilidades de Tailwind. */
