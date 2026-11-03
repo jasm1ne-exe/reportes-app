@@ -16,3 +16,4 @@ El proyecto está pensado inicialmente para **Magdalena, Jalisco (México)**, au
 - Formulario de reporte con categoría, título y descripción.
 - Registro con confirmación por correo, inicio y cierre de sesión.
 - Los reportes se pueden enviar **con o sin cuenta**; si hay sesión, el reporte queda asociado al usuario.
+-Medidas de seguridad y privacidad: En el mapa publico se muestran ubicaciones redondeadas a 3 decimales (100m aprox) y las imagenes solo se muestran cuando un admin cambia el estado del reporte. A la vez, las imagenes se comprimen al subirse para eliminar los metadatos con informacion vulnerable.

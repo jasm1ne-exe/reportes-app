@@ -45,7 +45,7 @@ export default function DetalleReporte() {
 
   useEffect(() => {
     let cancelado = false;
-    cargarReporte(id).then(({ data, error }) => {
+    cargarReporte(id, esAdmin).then(({ data, error }) => {
       if (cancelado) return;
       if (error?.code === "22P02") return setReporte(null); // id que no es uuid
       if (error) {
@@ -58,7 +58,7 @@ export default function DetalleReporte() {
     return () => {
       cancelado = true;
     };
-  }, [id, version]);
+  }, [id, version, esAdmin]);
 
   if (error) return <Mensaje>No se pudo cargar el reporte.</Mensaje>;
   if (reporte === undefined) {

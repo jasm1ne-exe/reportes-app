@@ -13,10 +13,22 @@ export function cargarCategorias() {
     .eq("activa", true)
     .order("orden");
 }
-// Un reporte con su historial, de la más antigua a la más reciente
-export function cargarReporte(id) {
+// Reportes del mapa público. Se leen de la vista reportes_publicos, que
+// esconde quién hizo el reporte, redondea la ubicación y oculta la foto
+// hasta que un admin lo revisa.
+export function cargarReportesMapa() {
   return supabase
-    .from("reportes")
+    .from("reportes_publicos")
+    .select(COLUMNAS_REPORTE)
+    .order("created_at", { ascending: false })
+    .limit(500);
+}
+
+// Un reporte con su historial, de la más antigua a la más reciente.
+// Los admins lo leen de la tabla (datos exactos); los demás, de la vista pública.
+export function cargarReporte(id, esAdmin = false) {
+  return supabase
+    .from(esAdmin ? "reportes" : "reportes_publicos")
     .select(`${COLUMNAS_REPORTE}, direccion, actualizaciones (id, estado, comentario, created_at)`)
     .eq("id", id)
     .order("created_at", { referencedTable: "actualizaciones" })
