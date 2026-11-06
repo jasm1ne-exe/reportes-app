@@ -13,6 +13,20 @@ import {
 import { CircleCheck, LoaderCircle, Plus } from "lucide-react";
 
 import "leaflet/dist/leaflet.css";
+import L from "leaflet";
+// importamos las imagenes del marcador para que Vite las incluya en la pagina compilada
+import iconoMarcador from "leaflet/dist/images/marker-icon.png";
+import iconoMarcador2x from "leaflet/dist/images/marker-icon-2x.png";
+import sombraMarcador from "leaflet/dist/images/marker-shadow.png";
+
+// Leaflet intenta adivinar donde estan sus imagenes y en Netlify se equivoca,
+// por eso le decimos a mano cuales usar
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconUrl: iconoMarcador,
+  iconRetinaUrl: iconoMarcador2x,
+  shadowUrl: sombraMarcador,
+});
 //el formulario, que se muestra encima del mapa.
 import FormularioReporte from "./formularioReportes";
 import MarcadorReporte from "./MarcadorReporte";
