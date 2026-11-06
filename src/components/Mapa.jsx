@@ -274,8 +274,9 @@ export default function MapView() {
             {moved
               ? "Ubicación seleccionada"
               : status === "success"
-              ? "Ubicación actual del dispositivo"
-              : "Ubicación predeterminada"}
+              ? "Ubicación actual del dispositivo. Puedes arrastrar el marcador para ajustar la ubicación" 
+              :" Ubicacion predeterminada (Magdalena, Jalisco, México). Puedes arrastrar el marcador para ajustar la ubicación  "}
+              
           </Popup>
         </Marker>
       </MapContainer>
