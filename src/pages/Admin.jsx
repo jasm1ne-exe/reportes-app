@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
+import { ArrowLeft } from "lucide-react";
 
 import { cargarReportesAdmin, infoEstado, LISTA_ESTADOS } from "../lib/reportes";
 
@@ -24,6 +25,15 @@ export default function Admin() {
   return (
     <div className="px-4 py-6">
       <div className="mx-auto max-w-5xl space-y-4">
+        {/* Enlace para regresar al mapa (igual que en DetalleReporte) */}
+        <Link
+          to="/"
+          className="inline-flex items-center gap-1 text-sm font-medium text-slate-600 hover:text-slate-900"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Volver al mapa
+        </Link>
+
         <div className="flex items-center justify-between gap-3">
           <h1 className="text-xl font-bold">Panel de administración</h1>
           <select

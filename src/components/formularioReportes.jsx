@@ -180,13 +180,16 @@ export default function FormularioReporte({
     : null);
 
   return (
+    // El contenedor cubre el área del mapa (no toda la pantalla) y pega la tarjeta abajo.
+    // pointer-events-none deja tocar el mapa encima del formulario para mover el pin;
+    // la tarjeta vuelve a recibir toques con pointer-events-auto.
     <div
-      className={`absolute inset-x-0 bottom-0 z-[1000] sm:bottom-4 sm:left-4 sm:right-auto sm:w-96 ${
-        abierto ? "" : "hidden"
+      className={`pointer-events-none absolute inset-0 z-[1000] flex-col justify-end sm:inset-4 sm:right-auto sm:w-96 ${
+        abierto ? "flex" : "hidden"
       }`}
     >
-      <div className="max-h-[65svh] overflow-y-auto rounded-t-2xl bg-white shadow-2xl sm:max-h-[calc(100svh-8rem)] sm:rounded-2xl">
-        <div className="sticky top-0 flex items-start justify-between gap-2 bg-white px-4 pt-4 pb-2">
+      <div className="pointer-events-auto max-h-[70%] overflow-y-auto rounded-t-2xl bg-white shadow-2xl sm:max-h-full sm:rounded-2xl">
+        <div className="sticky top-0 z-10 flex items-start justify-between gap-2 bg-white px-4 pt-3 pb-2 sm:pt-4">
           <div>
             <h2 className="text-lg font-semibold">Nuevo reporte</h2>
             <p className="text-xs text-slate-600">
@@ -242,7 +245,7 @@ export default function FormularioReporte({
               id="descripcion"
               value={descripcion}
               onChange={(e) => setDescripcion(e.target.value)}
-              rows={3}
+              rows={2}
               maxLength={2000}
               placeholder="Ej: Enfrente de la escuela X, hay muchos baches..."
               className={claseControl}
@@ -296,18 +299,21 @@ export default function FormularioReporte({
             </div>
           )}
 
-          <Boton
-            type="submit"
-            icono={Send}
-            cargando={Boolean(enviando)}
-            disabled={cargandoCategorias}
-          >
-            {enviando === "foto"
-              ? "Subiendo foto..."
-              : enviando
-                ? "Enviando..."
-                : "Enviar reporte"}
-          </Boton>
+          {/* sticky bottom-0: el botón se queda pegado abajo aunque el formulario haga scroll */}
+          <div className="sticky bottom-0 -mx-4 bg-white px-4 pt-2 pb-1">
+            <Boton
+              type="submit"
+              icono={Send}
+              cargando={Boolean(enviando)}
+              disabled={cargandoCategorias}
+            >
+              {enviando === "foto"
+                ? "Subiendo foto..."
+                : enviando
+                  ? "Enviando..."
+                  : "Enviar reporte"}
+            </Boton>
+          </div>
         </form>
       </div>
     </div>
