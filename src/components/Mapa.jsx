@@ -6,11 +6,10 @@ import {
   TileLayer,
   Marker,
   Popup,
-  ZoomControl,
   useMap,
   useMapEvents,
 } from "react-leaflet";
-import { CircleCheck, LoaderCircle, Plus } from "lucide-react";
+import { CircleCheck, LoaderCircle } from "lucide-react";
 
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
@@ -30,8 +29,8 @@ L.Icon.Default.mergeOptions({
 //el formulario, que se muestra encima del mapa.
 import FormularioReporte from "./formularioReportes";
 import MarcadorReporte from "./MarcadorReporte";
-import FiltroCategorias from "./FiltroCategorias";
-import { cargarCategorias, cargarReportesMapa } from "../lib/reportes";
+import ControlesMapa from "./ControlesMapa";
+import { cargarReportesMapa } from "../lib/reportes";
 
 // Coordenadas de magdalena, Jalisco, México. Se usan mientras llega la ubicacion real o si falla.
 const DEFAULT_POSITION = [20.9086744, -103.9815141];
@@ -55,10 +54,16 @@ function EnfocarPin({ position, activo }) {
   const map = useMap();
 
   useEffect(() => {
+    // Al abrir/cerrar el formulario el panel de arriba cambia de alto y el mapa de tamaño.
+    // Leaflet no se da cuenta solo, así que se le avisa para que no queden franjas grises.
+    map.invalidateSize();
+
     if (!activo || window.innerWidth >= 640) return;
     const zoom = map.getZoom();
     const punto = map.project(position, zoom);
-    punto.y += map.getSize().y * 0.3;
+    // Mueve el centro hacia abajo para que el pin quede en la parte de arriba
+    // que no tapa el formulario (el formulario ocupa hasta el 70% de abajo)
+    punto.y += map.getSize().y * 0.35;
     map.panTo(map.unproject(punto, zoom));
     // Solo al abrir; no se quiere mover el mapa cada vez que cambia el pin
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -97,7 +102,16 @@ function Aviso({ tono = "info", children }) {
   );
 }
 
-export default function MapView() {
+// Las categorías, el filtro y si el formulario está abierto vienen de Inicio.jsx
+export default function MapView({
+  categorias,
+  cargandoCategorias,
+  errorCategorias,
+  filtro,
+  onCambiarFiltro,
+  formAbierto,
+  onCambiarFormAbierto,
+}) {
   const [position, setPosition] = useState(DEFAULT_POSITION);
   // Centro del mapa: solo cambia con la geolocalización, no al arrastrar el marcador
   const [center, setCenter] = useState(DEFAULT_POSITION);
@@ -112,12 +126,6 @@ export default function MapView() {
   // Reportes ya guardados, cada uno se dibuja con su marcador
   const [reportes, setReportes] = useState([]);
   const [errorReportes, setErrorReportes] = useState(false);
-  const [categorias, setCategorias] = useState([]);
-  const [cargandoCategorias, setCargandoCategorias] = useState(true);
-  const [errorCategorias, setErrorCategorias] = useState(false);
-  // id de la categoría filtrada, o null para ver todas
-  const [filtro, setFiltro] = useState(null);
-  const [formAbierto, setFormAbierto] = useState(false);
   // id del reporte recién creado, para abrir su popup
   const [reporteNuevoId, setReporteNuevoId] = useState(null);
   const [mensajeExito, setMensajeExito] = useState(false);
@@ -146,17 +154,6 @@ export default function MapView() {
         setReportes(data);
       });
 
-    cargarCategorias().then(({ data, error }) => {
-      if (cancelado) return;
-      if (error) {
-        console.error(error);
-        setErrorCategorias(true);
-      } else {
-        setCategorias(data);
-      }
-      setCargandoCategorias(false);
-    });
-
     return () => {
       cancelado = true;
     };
@@ -171,8 +168,8 @@ export default function MapView() {
   const agregarReporte = (reporte) => {
     setReportes((anteriores) => [reporte, ...anteriores]);
     setReporteNuevoId(reporte.id);
-    setFiltro(null);
-    setFormAbierto(false);
+    onCambiarFiltro(null);
+    onCambiarFormAbierto(false);
     setMensajeExito(true);
     despues(4000, () => setMensajeExito(false));
   };
@@ -247,7 +244,11 @@ export default function MapView() {
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        <ZoomControl position="bottomright" />
+        {/* GPS y +/−; van aquí dentro porque usan useMap() */}
+        <ControlesMapa
+          onGps={reintentarUbicacion}
+          buscando={status === "loading"}
+        />
 
         <MapUpdater position={center} />
         <EnfocarPin position={position} activo={formAbierto} />
@@ -275,22 +276,13 @@ export default function MapView() {
               ? "Ubicación seleccionada"
               : status === "success"
               ? "Ubicación actual del dispositivo. Puedes arrastrar el marcador para ajustar la ubicación" 
-              :" Ubicacion predeterminada (Magdalena, Jalisco, México). Puedes arrastrar el marcador para ajustar la ubicación  "}
-              
+              :" Ubicación predeterminada (Magdalena, Jalisco, México). Puedes arrastrar el marcador para ajustar la ubicación  "}
           </Popup>
         </Marker>
       </MapContainer>
 
-      {/* Filtro y avisos arriba del mapa. pointer-events-none deja pasar los toques al mapa entre los chips. */}
+      {/* Avisos arriba del mapa. pointer-events-none deja pasar los toques al mapa entre los avisos. */}
       <div className="pointer-events-none absolute inset-x-0 top-0 z-[1000] space-y-2 p-3">
-        {categorias.length > 0 && (
-          <FiltroCategorias
-            categorias={categorias}
-            seleccionada={filtro}
-            onCambiar={setFiltro}
-          />
-        )}
-
         {status === "loading" && (
           <Aviso>
             <LoaderCircle className="h-3.5 w-3.5 animate-spin" />
@@ -330,28 +322,6 @@ export default function MapView() {
         )}
       </div>
 
-      <button
-        type="button"
-        onClick={reintentarUbicacion}
-        disabled={status === "loading"}
-        title="Ir a mi ubicación"
-        aria-label="Ir a mi ubicación"
-        className="absolute bottom-28 right-2.5 z-[1000] flex h-11 w-11 items-center justify-center rounded-full bg-white text-xs font-semibold text-slate-700 shadow-md transition hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-marca-500 disabled:cursor-wait disabled:opacity-60"
-      >
-        {status === "loading" ? "..." : "GPS"}
-      </button>
-
-      {!formAbierto && (
-        <button
-          type="button"
-          onClick={() => setFormAbierto(true)}
-          className="absolute bottom-6 left-1/2 z-[1000] flex -translate-x-1/2 items-center gap-2 rounded-full bg-marca-600 px-5 py-3 text-sm font-semibold text-white shadow-lg transition hover:bg-marca-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-marca-500 focus-visible:ring-offset-2"
-        >
-          <Plus className="h-5 w-5" />
-          Reportar un problema
-        </button>
-      )}
-
       {/* Le pasa la posición del marcador, no la del centro, para que el reporte se guarde donde está el pin. */}
       <FormularioReporte
         position={position}
@@ -359,7 +329,7 @@ export default function MapView() {
         cargandoCategorias={cargandoCategorias}
         errorCategorias={errorCategorias}
         abierto={formAbierto}
-        onCerrar={() => setFormAbierto(false)}
+        onCerrar={() => onCambiarFormAbierto(false)}
         onReporteCreado={agregarReporte}
       />
     </div>

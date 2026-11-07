@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router";
+import { Route, Routes, useLocation } from "react-router";
 
 import Encabezado from "./components/encabezado";
 import RutaAdmin from "./components/RutaAdmin";
@@ -11,9 +11,13 @@ import DetalleReporte from "./pages/DetalleReporte";
 import Admin from "./pages/Admin";
 
 export default function App() {
+  // En el mapa ("/") no va el encabezado porque ahí se usa el panel lateral
+  const { pathname } = useLocation();
+  const esMapa = pathname === "/";
+
   return (
     <div className="flex h-svh flex-col">
-      <Encabezado />
+      {!esMapa && <Encabezado />}
 
       {/* El mapa ocupa todo el alto disponible; las demás páginas hacen scroll aquí */}
       <main className="relative flex-1 overflow-y-auto">

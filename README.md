@@ -89,7 +89,7 @@ El proyecto se publica en Netlify. El comando de build es `npm run build` y la c
 - Notificaciones al ciudadano cuando su reporte cambia de estado.
 - Estadísticas de reportes por categoría y colonia.
 
-## Autor
+## Autor 
 
 Hecho por Jasmine.
 
