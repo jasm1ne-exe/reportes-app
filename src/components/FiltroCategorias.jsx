@@ -6,10 +6,13 @@ import { iconoCategoria } from "../lib/iconosCategoria";
 // celular: una fila con scroll horizontal | sm: chips que bajan de renglón | lg: lista vertical
 export default function FiltroCategorias({ categorias, seleccionada, onCambiar }) {
   const claseChip = (activo) =>
-    `flex h-8 shrink-0 items-center gap-2 rounded-full border px-3 text-left text-[13px] font-medium sm:h-10 sm:px-3.5 sm:text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-marca-500 lg:h-11 lg:w-full lg:gap-3 lg:rounded-lg lg:border-0 lg:text-[15px] ${
+    `flex h-8 shrink-0 items-center gap-2 rounded-full border px-3 text-left text-[13px] sm:h-10 sm:px-3.5 sm:text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-marca-500 lg:h-11 lg:w-full lg:gap-3 lg:rounded-lg lg:border-0 lg:text-[15px] ${
+      // Activo: fondo azul muy claro, texto azul oscuro (contraste 10.5:1) y borde + anillo azul.
+      // En lg no hay borde (lg:border-0 de arriba) ni anillo; como el fondo casi no se
+      // distingue del panel blanco, la negrita ayuda a notar cuál está seleccionado.
       activo
-        ? "border-slate-900 bg-slate-900 text-white"
-        : "border-slate-200 bg-white text-slate-700 hover:bg-slate-100"
+        ? "border-marca-500 bg-marca-50 font-semibold text-marca-700 ring-1 ring-marca-500 lg:ring-0"
+        : "border-slate-200 bg-white font-medium text-slate-700 hover:bg-slate-100"
     }`;
 
   return (
