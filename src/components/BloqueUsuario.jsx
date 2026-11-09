@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router";
-import { LogOut } from "lucide-react";
+import { LogOut, User } from "lucide-react";
 import { useAuth } from "../context/useAuth";
 
 // Parte del usuario: su inicial, nombre, "Panel" (solo admins) y cerrar sesión.
@@ -56,21 +56,35 @@ export default function BloqueUsuario({ variante = "barra" }) {
       );
     }
 
+    // Sin sesión: en celular un solo botón de ícono (en /login está el enlace para registrarse).
+    // Desde sm, "Iniciar sesión" y "Registrarme" con borde, para que el único botón
+    // azul sólido de la pantalla sea "Reportar un problema".
     return (
-      <div className="flex items-center gap-1 text-xs sm:gap-2 sm:text-sm">
+      <>
         <Link
           to="/login"
-          className="inline-flex min-h-10 items-center justify-center rounded-lg px-2 font-medium sm:min-h-11 sm:px-3 text-marca-700 hover:bg-marca-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-marca-500 lg:flex-1"
+          aria-label="Iniciar sesión o registrarse"
+          title="Iniciar sesión o registrarse"
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-marca-50 text-marca-700 hover:bg-marca-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-marca-500 sm:hidden"
         >
-          Iniciar sesión
+          <User className="h-5 w-5" />
         </Link>
-        <Link
-          to="/registro"
-          className="inline-flex min-h-10 items-center justify-center rounded-lg bg-marca-600 px-2.5 font-medium sm:min-h-11 sm:px-3 text-white hover:bg-marca-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-marca-500 lg:flex-1"
-        >
-          Registrarme
-        </Link>
-      </div>
+
+        <div className="hidden items-center gap-2 text-sm sm:flex">
+          <Link
+            to="/login"
+            className="inline-flex min-h-11 items-center justify-center rounded-lg px-3 font-medium text-marca-700 hover:bg-marca-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-marca-500 lg:flex-1"
+          >
+            Iniciar sesión
+          </Link>
+          <Link
+            to="/registro"
+            className="inline-flex min-h-11 items-center justify-center rounded-lg border border-marca-600 bg-white px-3 font-medium text-marca-700 hover:bg-marca-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-marca-500 lg:flex-1"
+          >
+            Registrarme
+          </Link>
+        </div>
+      </>
     );
   }
 

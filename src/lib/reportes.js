@@ -3,13 +3,13 @@ import { supabase } from "./supabaseClient";
 // Columnas que necesita el mapa. lat y lng son columnas calculadas en la base
 // de datos, así no hay que decodificar el punto de PostGIS en el cliente.
 export const COLUMNAS_REPORTE =
-  "id, titulo, descripcion, estado, lat, lng, foto_path, created_at, categoria_id, categoria:categorias (nombre, color)";
+  "id, folio, titulo, descripcion, estado, lat, lng, foto_path, created_at, categoria_id, categoria:categorias (nombre, color, icono)";
 
 // Categorías activas, las usan el filtro del mapa y el formulario
 export function cargarCategorias() {
   return supabase
     .from("categorias")
-    .select("id, nombre, color")
+    .select("id, nombre, color, icono")
     .eq("activa", true)
     .order("orden");
 }
@@ -66,6 +66,35 @@ export function cargarReportesAdmin(estado) {
     .order("created_at", { ascending: false });
   if (estado) consulta = consulta.eq("estado", estado);
   return consulta;
+}
+
+// Fecha y hora en formato corto, ej: "8 nov 2026, 10:30"
+export function formatearFecha(fecha) {
+  return new Date(fecha).toLocaleString("es-MX", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  });
+}
+
+// Deja el folio como lo guarda la base de datos.
+// Acepta "mgd-15", "15", " MGD-0015 " y los convierte en "MGD-0015".
+// Si no parece folio, devuelve el texto en mayúsculas tal cual.
+export function normalizarFolio(texto) {
+  let limpio = texto.trim().toUpperCase().replace(/\s/g, "");
+  if (limpio.startsWith("MGD-")) limpio = limpio.slice(4);
+  else if (limpio.startsWith("MGD")) limpio = limpio.slice(3);
+
+  if (!/^\d+$/.test(limpio)) return texto.trim().toUpperCase();
+
+  // Quita ceros de más y vuelve a rellenar hasta 4 dígitos
+  const numero = String(Number(limpio));
+  return "MGD-" + numero.padStart(4, "0");
+}
+
+// Consulta pública por folio (función consultar_folio en la base de datos).
+// data es null si el folio no existe.
+export function consultarFolio(folio) {
+  return supabase.rpc("consultar_folio", { p_folio: folio });
 }
 
 // El trigger en la base de datos cambia el estado del reporte

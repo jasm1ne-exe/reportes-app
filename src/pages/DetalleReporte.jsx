@@ -2,25 +2,11 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router";
 import { ArrowLeft, LoaderCircle, MapPin } from "lucide-react";
 
+import EtiquetaEstado from "../components/EtiquetaEstado";
 import FormularioActualizacion from "../components/FormularioActualizacion";
 import { useAuth } from "../context/useAuth";
-import { cargarReporte, infoEstado, urlFoto } from "../lib/reportes";
+import { cargarReporte, formatearFecha, urlFoto } from "../lib/reportes";
 
-function Etiqueta({ estado }) {
-  const { texto, clases } = infoEstado(estado);
-  return (
-    <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${clases}`}>
-      {texto}
-    </span>
-  );
-}
-
-function formatearFecha(fecha) {
-  return new Date(fecha).toLocaleString("es-MX", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  });
-}
 
 // Mensaje centrado para los estados de carga, error y no encontrado
 function Mensaje({ children }) {
@@ -95,9 +81,14 @@ export default function DetalleReporte() {
               {reporte.categoria?.nombre}
             </p>
             <h1 className="text-xl font-bold">{reporte.titulo}</h1>
-            <div className="flex items-center gap-2 text-xs text-slate-500">
-              <Etiqueta estado={reporte.estado} />
+            <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500">
+              <EtiquetaEstado estado={reporte.estado} />
               {formatearFecha(reporte.created_at)}
+              {reporte.folio && (
+                <span className="font-mono font-semibold text-slate-700">
+                  Folio {reporte.folio}
+                </span>
+              )}
             </div>
           </header>
 
@@ -129,7 +120,7 @@ export default function DetalleReporte() {
                 <li key={paso.id} className="relative">
                   <span className="absolute -left-[23px] top-1 h-3 w-3 rounded-full border-2 border-white bg-slate-400" />
                   <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500">
-                    <Etiqueta estado={paso.estado} />
+                    <EtiquetaEstado estado={paso.estado} />
                     {formatearFecha(paso.created_at)}
                   </div>
                   {paso.comentario && (

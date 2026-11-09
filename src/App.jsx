@@ -9,6 +9,7 @@ import RecuperarContrasena from "./pages/RecuperarContrasena";
 import NuevaContrasena from "./pages/NuevaContrasena";
 import DetalleReporte from "./pages/DetalleReporte";
 import Admin from "./pages/Admin";
+import Seguimiento from "./pages/Seguimiento";
 
 export default function App() {
   // En el mapa ("/") no va el encabezado porque ahí se usa el panel lateral
@@ -28,6 +29,7 @@ export default function App() {
           <Route path="/recuperar" element={<RecuperarContrasena />} />
           <Route path="/nueva-contrasena" element={<NuevaContrasena />} />
           <Route path="/reporte/:id" element={<DetalleReporte />} />
+          <Route path="/seguimiento" element={<Seguimiento />} />
           <Route path="/admin" element={<RutaAdmin><Admin /></RutaAdmin>} />
         </Routes>
       </main>

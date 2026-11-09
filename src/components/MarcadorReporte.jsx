@@ -3,23 +3,51 @@ import { useEffect, useMemo, useRef } from "react";
 import { Marker, Popup } from "react-leaflet";
 import { Link } from "react-router";
 import L from "leaflet";
+import { renderToStaticMarkup } from "react-dom/server";
+import { Check } from "lucide-react";
 import { infoEstado, urlFoto } from "../lib/reportes";
+import { iconoCategoria } from "../lib/iconosCategoria";
 
-// Círculo del color de la categoría, para distinguirlo del marcador azul de ubicacion.
-function crearIcono(color) {
+// Círculo de 30px del color de la categoría con su ícono en blanco adentro.
+// Leaflet no sabe dibujar componentes de React, solo HTML en texto, por eso
+// renderToStaticMarkup convierte el ícono de lucide a un <svg> en texto.
+// El estado se marca en la esquina de arriba a la derecha:
+// pendiente = nada | en revisión / en proceso = punto oscuro | resuelto = más transparente + palomita verde
+function crearIcono(color, nombreIcono, estado) {
+  const Icono = iconoCategoria(nombreIcono);
+  const svg = renderToStaticMarkup(<Icono size={16} color="white" strokeWidth={2.5} />);
+
+  // La opacidad va solo en el círculo, así la palomita no se ve deslavada
+  const opacidad = estado === "resuelto" ? "opacity:0.55;" : "";
+
+  let indicador = "";
+  if (estado === "en_revision" || estado === "en_proceso") {
+    indicador = `<span style="position:absolute;top:-2px;right:-2px;box-sizing:border-box;width:10px;height:10px;border-radius:9999px;background:#0f172a;border:2px solid white"></span>`;
+  } else if (estado === "resuelto") {
+    const palomita = renderToStaticMarkup(<Check size={9} color="white" strokeWidth={4} />);
+    indicador = `<span style="position:absolute;top:-3px;right:-3px;display:flex;align-items:center;justify-content:center;box-sizing:border-box;width:14px;height:14px;border-radius:9999px;background:#16a34a;border:2px solid white">${palomita}</span>`;
+  }
+
   return L.divIcon({
     className: "",
-    html: `<span style="display:block;width:20px;height:20px;border-radius:9999px;background:${color};border:3px solid white;box-shadow:0 1px 4px rgba(0,0,0,.4)"></span>`,
-    iconSize: [20, 20],
-    iconAnchor: [10, 10],
-    popupAnchor: [0, -10],
+    html: `<span style="position:relative;display:block;width:30px;height:30px"><span style="display:flex;align-items:center;justify-content:center;box-sizing:border-box;width:30px;height:30px;border-radius:9999px;background:${color};border:2px solid white;box-shadow:0 1px 4px rgba(0,0,0,.4);${opacidad}">${svg}</span>${indicador}</span>`,
+    iconSize: [30, 30],
+    // el centro del círculo queda justo en la ubicación del reporte
+    iconAnchor: [15, 15],
+    // el popup sale desde el borde de arriba del círculo
+    popupAnchor: [0, -15],
   });
 }
 
 // abrir: abre el popup al montarse (se usa con el reporte recién creado)
 export default function MarcadorReporte({ reporte, abrir = false }) {
   const color = reporte.categoria?.color ?? "#475569";
-  const icono = useMemo(() => crearIcono(color), [color]);
+  const nombreIcono = reporte.categoria?.icono;
+  const estadoReporte = reporte.estado;
+  const icono = useMemo(
+    () => crearIcono(color, nombreIcono, estadoReporte),
+    [color, nombreIcono, estadoReporte]
+  );
   const foto = urlFoto(reporte.foto_path);
   const estado = infoEstado(reporte.estado);
   const markerRef = useRef(null);

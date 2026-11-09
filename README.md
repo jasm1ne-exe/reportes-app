@@ -10,7 +10,7 @@ El proyecto está pensado inicialmente para **Magdalena, Jalisco (México)**, au
 ## Demo
 
 - Sitio en vivo: _https://sigeremu.netlify.app/_
-- Capturas:
+
 
 ## Funcionalidades
 

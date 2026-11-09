@@ -1,5 +1,5 @@
 import { Link } from "react-router";
-import { LayoutDashboard, MapPin, Plus } from "lucide-react";
+import { Check, LayoutDashboard, MapPin, Plus, Search } from "lucide-react";
 import { useAuth } from "../context/useAuth";
 import BloqueUsuario from "./BloqueUsuario";
 import FiltroCategorias from "./FiltroCategorias";
@@ -26,15 +26,17 @@ export default function PanelLateral({ categorias, filtro, onCambiarFiltro, form
         <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-marca-600 sm:h-11 sm:w-11">
           <MapPin className="h-5 w-5 text-white sm:h-6 sm:w-6" />
         </span>
-        <span className="min-w-0">
-          <h1 className="text-sm leading-snug font-bold sm:text-[17px] sm:leading-tight lg:text-[19px]">
+        {/* En celular el título y "MGD, JAL" van lado a lado en un solo renglón;
+            desde sm vuelven a ir uno debajo del otro */}
+        <span className="flex min-w-0 items-baseline gap-1.5 sm:block">
+          <h1 className="truncate text-sm leading-snug font-bold sm:overflow-visible sm:text-[17px] sm:leading-tight sm:whitespace-normal lg:text-[19px]">
             {/* En celular va el título corto para que quepa en un renglón */}
             <span className="sm:hidden">Reportes ciudadanos</span>
             <span className="hidden sm:inline">
               Sistema web de gestion y monitoreo de reportes ciudadanos
             </span>
           </h1>
-          <span className="block text-xs font-semibold tracking-wide text-slate-500 sm:text-[13px]">
+          <span className="shrink-0 text-[11px] font-semibold tracking-wide text-slate-500 sm:block sm:text-[13px]">
             MGD, JAL
           </span>
         </span>
@@ -82,6 +84,45 @@ export default function PanelLateral({ categorias, filtro, onCambiarFiltro, form
             onCambiar={onCambiarFiltro}
           />
         )}
+
+        {/* Leyenda de los indicadores de estado del marcador (solo en escritorio).
+            Las muestras son copias pequeñas del marcador de MarcadorReporte.jsx */}
+        <div className="mt-4 hidden lg:block">
+          <p className="mb-2 text-xs font-bold tracking-wider text-slate-500 uppercase">
+            Estado del reporte
+          </p>
+          <div className="space-y-1.5 text-sm text-slate-700">
+            <div className="flex items-center gap-3">
+              <span className="h-5 w-5 shrink-0 rounded-full border-2 border-white bg-gray-500 shadow" />
+              Pendiente
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="relative h-5 w-5 shrink-0">
+                <span className="block h-5 w-5 rounded-full border-2 border-white bg-gray-500 shadow" />
+                <span className="absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full border-2 border-white bg-slate-900" />
+              </span>
+              En revisión o en proceso
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="relative h-5 w-5 shrink-0">
+                <span className="block h-5 w-5 rounded-full border-2 border-white bg-gray-500 opacity-55 shadow" />
+                <span className="absolute -top-1 -right-1 flex h-3 w-3 items-center justify-center rounded-full border-2 border-white bg-green-600">
+                  <Check className="h-1.5 w-1.5 text-white" strokeWidth={5} />
+                </span>
+              </span>
+              Resuelto
+            </div>
+          </div>
+        </div>
+
+        {/* Para que quien ya reportó pueda ver cómo va su reporte */}
+        <Link
+          to="/seguimiento"
+          className="mt-2 inline-flex items-center gap-1.5 text-sm font-medium text-marca-700 hover:underline lg:mt-3"
+        >
+          <Search className="h-4 w-4" />
+          Consultar mi folio
+        </Link>
       </div>
 
       {/* Botón "Reportar un problema". Debajo de lg es absolute: como el aside no es relative,
