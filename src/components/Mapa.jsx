@@ -13,23 +13,28 @@ import { CircleCheck, LoaderCircle } from "lucide-react";
 
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
-// importamos las imagenes del marcador para que Vite las incluya en la pagina compilada
-import iconoMarcador from "leaflet/dist/images/marker-icon.png";
-import iconoMarcador2x from "leaflet/dist/images/marker-icon-2x.png";
-import sombraMarcador from "leaflet/dist/images/marker-shadow.png";
 
-// Leaflet intenta adivinar donde estan sus imagenes y en Netlify se equivoca,
-// por eso le decimos a mano cuales usar
-delete L.Icon.Default.prototype._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconUrl: iconoMarcador,
-  iconRetinaUrl: iconoMarcador2x,
-  shadowUrl: sombraMarcador,
+// Pin en forma de gota para marcar dónde se hará el reporte.
+// Es un SVG propio (ya no se usa el pin azul de Leaflet, que era grande y tapaba
+// los reportes de alrededor). La punta de la gota está en (14, 36) del viewBox;
+// a 24px de ancho eso queda en (12, 31), y ahí va el anclaje.
+const PIN_UBICACION = L.divIcon({
+  className: "",
+  html: `<svg width="24" height="33" viewBox="0 0 28 38" style="display:block;filter:drop-shadow(0 1px 2px rgba(0,0,0,.45))">
+    <path d="M14 2C7.4 2 2 7.4 2 14c0 9.5 12 22 12 22s12-12.5 12-22C26 7.4 20.6 2 14 2z" fill="#1e3fae" stroke="white" stroke-width="2.5" stroke-linejoin="round"/>
+    <circle cx="14" cy="14" r="4.5" fill="white"/>
+  </svg>`,
+  iconSize: [24, 33],
+  // la punta de abajo es la que señala el lugar exacto
+  iconAnchor: [12, 31],
+  // el popup sale arriba de la gota
+  popupAnchor: [0, -30],
 });
 //el formulario, que se muestra encima del mapa.
 import FormularioReporte from "./formularioReportes";
 import MarcadorReporte from "./MarcadorReporte";
 import ControlesMapa from "./ControlesMapa";
+import AvisoFolio from "./AvisoFolio";
 import { cargarReportesMapa } from "../lib/reportes";
 
 // Coordenadas de magdalena, Jalisco, México. Se usan mientras llega la ubicacion real o si falla.
@@ -128,6 +133,7 @@ export default function MapView({
   const [errorReportes, setErrorReportes] = useState(false);
   // id del reporte recién creado, para abrir su popup
   const [reporteNuevoId, setReporteNuevoId] = useState(null);
+  // false = sin aviso, true = aviso corto, o el folio del reporte (ej: "MGD-0007")
   const [mensajeExito, setMensajeExito] = useState(false);
   const temporizadores = useRef([]);
 
@@ -170,8 +176,13 @@ export default function MapView({
     setReporteNuevoId(reporte.id);
     onCambiarFiltro(null);
     onCambiarFormAbierto(false);
-    setMensajeExito(true);
-    despues(4000, () => setMensajeExito(false));
+    if (reporte.folio) {
+      // Con folio el aviso se queda hasta que el usuario lo cierre
+      setMensajeExito(reporte.folio);
+    } else {
+      setMensajeExito(true);
+      despues(4000, () => setMensajeExito(false));
+    }
   };
 
   const seleccionarUbicacion = (nueva) => {
@@ -265,8 +276,12 @@ export default function MapView({
           />
         ))}
 
+        {/* zIndexOffset: con el formulario abierto el pin va encima de todos los reportes
+            para poder arrastrarlo; cerrado se va hasta abajo para no tapar ninguno */}
         <Marker
           position={position}
+          icon={PIN_UBICACION}
+          zIndexOffset={formAbierto ? 1000 : -1000}
           draggable={true}
           eventHandlers={markerEvents}
           ref={markerRef}
@@ -314,7 +329,14 @@ export default function MapView({
           <Aviso tono="error">No se pudieron cargar los reportes.</Aviso>
         )}
 
-        {mensajeExito && (
+        {typeof mensajeExito === "string" && !formAbierto && (
+          <AvisoFolio
+            folio={mensajeExito}
+            onCerrar={() => setMensajeExito(false)}
+          />
+        )}
+
+        {mensajeExito === true && (
           <Aviso tono="exito">
             <CircleCheck className="h-3.5 w-3.5" />
             ¡Reporte enviado! Gracias.
