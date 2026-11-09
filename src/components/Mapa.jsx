@@ -9,7 +9,7 @@ import {
   useMap,
   useMapEvents,
 } from "react-leaflet";
-import { CircleCheck, LoaderCircle } from "lucide-react";
+import { CircleCheck, LoaderCircle, X } from "lucide-react";
 
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
@@ -126,6 +126,8 @@ export default function MapView({
   );
   // El aviso de "ubicación detectada" se oculta solo después de unos segundos
   const [avisoUbicacionVisible, setAvisoUbicacionVisible] = useState(true);
+  // true cuando el usuario cierra con la X el aviso de "no pudimos usar tu ubicación"
+  const [avisoErrorCerrado, setAvisoErrorCerrado] = useState(false);
   const [moved, setMoved] = useState(false);
   const markerRef = useRef(null);
   // Reportes ya guardados, cada uno se dibuja con su marcador
@@ -238,6 +240,8 @@ export default function MapView({
 
   const reintentarUbicacion = () => {
     if (!navigator.geolocation) return;
+    // Si vuelve a fallar, el aviso se tiene que ver otra vez
+    setAvisoErrorCerrado(false);
     setStatus("loading");
     obtenerUbicacion({ maximumAge: 0 });
   };
@@ -312,15 +316,31 @@ export default function MapView({
           </Aviso>
         )}
 
-        {status === "fallback" && (
+        {/* Tocar el mapa solo mueve el pin con el formulario abierto;
+            con el formulario cerrado lo que funciona es arrastrar el pin */}
+        {status === "fallback" && !avisoErrorCerrado && (
           <Aviso tono="alerta">
-            No se pudo obtener tu ubicación.
+            <span>
+              No pudimos usar tu ubicación.{" "}
+              {formAbierto
+                ? "Toca el mapa para marcar el lugar."
+                : "Arrastra el pin azul al lugar del problema."}
+            </span>
             <button
               type="button"
               onClick={reintentarUbicacion}
-              className="underline hover:no-underline"
+              className="shrink-0 underline hover:no-underline"
             >
               Reintentar
+            </button>
+            <button
+              type="button"
+              onClick={() => setAvisoErrorCerrado(true)}
+              aria-label="Cerrar aviso"
+              title="Cerrar aviso"
+              className="-my-1 -mr-1.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full hover:bg-amber-100"
+            >
+              <X className="h-3.5 w-3.5" />
             </button>
           </Aviso>
         )}
