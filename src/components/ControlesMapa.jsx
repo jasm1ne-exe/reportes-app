@@ -3,7 +3,9 @@ import { useMap } from "react-leaflet";
 import L from "leaflet";
 import { LocateFixed, Minus, Plus } from "lucide-react";
 
-// Botones del mapa: GPS arriba y +/− agrupados abajo.
+// Botones del mapa: GPS arriba y +/− agrupados abajo (los +/− solo desde sm).
+// El contenedor está pegado por abajo (bottom-28 en celular), así que al ocultar +/−
+// el GPS baja a ese lugar y queda justo encima del botón "Reportar un problema".
 // Va dentro de <MapContainer> para poder usar useMap().
 // onGps: función para volver a buscar la ubicación | buscando: true mientras se busca
 export default function ControlesMapa({ onGps, buscando }) {
@@ -40,7 +42,8 @@ export default function ControlesMapa({ onGps, buscando }) {
         </span>
       </button>
 
-      <div className="flex flex-col overflow-hidden rounded-xl bg-white shadow-md">
+      {/* + y − solo desde sm: en celular se hace zoom con los dedos */}
+      <div className="hidden flex-col overflow-hidden rounded-xl bg-white shadow-md sm:flex">
         <button
           type="button"
           onClick={() => map.zoomIn()}
