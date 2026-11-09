@@ -42,7 +42,7 @@ export default function Admin() {
               setFiltro(e.target.value);
               setCargando(true);
             }}
-            className="rounded-lg border border-slate-300 px-2 py-1 text-sm"
+            className="rounded-lg border border-slate-300 px-2 py-1 text-base sm:text-sm"
           >
             <option value="">Todos</option>
             {LISTA_ESTADOS.map((e) => (

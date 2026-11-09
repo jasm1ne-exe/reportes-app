@@ -23,7 +23,7 @@ export default function FormularioActualizacion({ reporte, onPublicado }) {
   return (
     <form onSubmit={enviar} className="space-y-3 border-t border-slate-200 pt-4">
       <h2 className="text-sm font-semibold">Actualizar reporte</h2>
-      <select value={estado} onChange={(e) => setEstado(e.target.value)} className="w-full rounded-lg border border-slate-300 px-2 py-1.5 text-sm">
+      <select value={estado} onChange={(e) => setEstado(e.target.value)} className="w-full rounded-lg border border-slate-300 px-2 py-1.5 text-base sm:text-sm">
         {LISTA_ESTADOS.map((e) => (
           <option key={e} value={e}>{infoEstado(e).texto}</option>
         ))}
@@ -34,7 +34,7 @@ export default function FormularioActualizacion({ reporte, onPublicado }) {
         maxLength={1000}
         rows={3}
         placeholder="Comentario para el ciudadano (opcional)"
-        className="w-full rounded-lg border border-slate-300 px-2 py-1.5 text-sm"
+        className="w-full rounded-lg border border-slate-300 px-2 py-1.5 text-base sm:text-sm"
       />
       {error && <p className="text-sm text-red-600">{error}</p>}
       {/* Puedes usar tu componente <Boton> de ui/Boton.jsx en lugar de este */}
