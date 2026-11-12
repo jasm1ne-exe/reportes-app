@@ -48,7 +48,6 @@ export default function AuthProvider({ children }) {
   const valor = {
     cargandoPerfil,
     cargando,
-    session,
     user,
     perfil: perfilActual,
     esAdmin: perfilActual?.rol === "admin",

@@ -23,6 +23,9 @@ const ICONOS = {
   CircleHelp,
 };
 
+// Gris que se usa cuando una categoría no tiene color
+export const COLOR_SIN_CATEGORIA = "#475569";
+
 // Si el nombre no está en la lista (o viene vacío) se usa el signo de pregunta
 export function iconoCategoria(nombre) {
   return ICONOS[nombre] ?? CircleHelp;

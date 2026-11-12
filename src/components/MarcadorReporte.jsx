@@ -5,8 +5,9 @@ import { Link } from "react-router";
 import L from "leaflet";
 import { renderToStaticMarkup } from "react-dom/server";
 import { Check } from "lucide-react";
-import { infoEstado, urlFoto } from "../lib/reportes";
-import { iconoCategoria } from "../lib/iconosCategoria";
+import EtiquetaEstado from "./EtiquetaEstado";
+import { urlFoto } from "../lib/reportes";
+import { COLOR_SIN_CATEGORIA, iconoCategoria } from "../lib/iconosCategoria";
 
 // Círculo de 30px del color de la categoría con su ícono en blanco adentro.
 // Leaflet no sabe dibujar componentes de React, solo HTML en texto, por eso
@@ -41,7 +42,7 @@ function crearIcono(color, nombreIcono, estado) {
 
 // abrir: abre el popup al montarse (se usa con el reporte recién creado)
 export default function MarcadorReporte({ reporte, abrir = false }) {
-  const color = reporte.categoria?.color ?? "#475569";
+  const color = reporte.categoria?.color ?? COLOR_SIN_CATEGORIA;
   const nombreIcono = reporte.categoria?.icono;
   const estadoReporte = reporte.estado;
   const icono = useMemo(
@@ -49,7 +50,6 @@ export default function MarcadorReporte({ reporte, abrir = false }) {
     [color, nombreIcono, estadoReporte]
   );
   const foto = urlFoto(reporte.foto_path);
-  const estado = infoEstado(reporte.estado);
   const markerRef = useRef(null);
 
   useEffect(() => {
@@ -77,9 +77,7 @@ export default function MarcadorReporte({ reporte, abrir = false }) {
             />
           )}
           <div className="flex items-center gap-2 pt-1 text-xs text-slate-500">
-            <span className={`rounded-full px-2 py-0.5 font-medium ${estado.clases}`}>
-              {estado.texto}
-            </span>
+            <EtiquetaEstado estado={reporte.estado} />
             {new Date(reporte.created_at).toLocaleDateString("es-MX")}
           </div>
           <Link

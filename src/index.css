@@ -8,7 +8,6 @@
   --color-marca-600: #1e3fae;
   --color-marca-700: #172f85;
   --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
-
 }
 
 /* Estilos base mínimos; todo lo demás se hace con utilidades de Tailwind. */

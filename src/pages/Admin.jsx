@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
-import { ArrowLeft } from "lucide-react";
 
+import EtiquetaEstado from "../components/EtiquetaEstado";
+import VolverAlMapa from "../components/ui/VolverAlMapa";
 import { cargarReportesAdmin, infoEstado, LISTA_ESTADOS } from "../lib/reportes";
 
 export default function Admin() {
@@ -25,14 +26,7 @@ export default function Admin() {
   return (
     <div className="px-4 py-6">
       <div className="mx-auto max-w-5xl space-y-4">
-        {/* Enlace para regresar al mapa (igual que en DetalleReporte) */}
-        <Link
-          to="/"
-          className="inline-flex items-center gap-1 text-sm font-medium text-slate-600 hover:text-slate-900"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Volver al mapa
-        </Link>
+        <VolverAlMapa />
 
         <div className="flex items-center justify-between gap-3">
           <h1 className="text-xl font-bold">Panel de administración</h1>
@@ -64,9 +58,7 @@ export default function Admin() {
                   <p className="text-xs text-slate-500">{r.categoria?.nombre}</p>
                 </div>
                 <div className="flex shrink-0 items-center gap-3">
-                  <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${infoEstado(r.estado).clases}`}>
-                    {infoEstado(r.estado).texto}
-                  </span>
+                  <EtiquetaEstado estado={r.estado} />
                   <Link to={`/reporte/${r.id}`} className="text-sm font-medium text-marca-600 hover:underline">
                     Gestionar
                   </Link>

@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
-import { Link, useSearchParams } from "react-router";
-import { ArrowLeft, LoaderCircle, MapPin, Search } from "lucide-react";
+import { useSearchParams } from "react-router";
+import { LoaderCircle, MapPin, Search } from "lucide-react";
 
 import EtiquetaEstado from "../components/EtiquetaEstado";
+import HistorialReporte from "../components/HistorialReporte";
 import Boton from "../components/ui/Boton";
+import VolverAlMapa from "../components/ui/VolverAlMapa";
 import { claseControl } from "../components/ui/clases";
+import { COLOR_SIN_CATEGORIA } from "../lib/iconosCategoria";
 import {
   consultarFolio,
   formatearFecha,
@@ -59,13 +62,7 @@ export default function Seguimiento() {
   return (
     <div className="px-4 py-6">
       <div className="mx-auto max-w-xl space-y-4">
-        <Link
-          to="/"
-          className="inline-flex items-center gap-1 text-sm font-medium text-slate-600 hover:text-slate-900"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Volver al mapa
-        </Link>
+        <VolverAlMapa />
 
         <section className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
           <h1 className="text-xl font-bold">Seguimiento de reporte</h1>
@@ -124,13 +121,7 @@ export default function Seguimiento() {
 function ResultadoFolio({ reporte }) {
   const rechazado = reporte.estado === "rechazado";
   const foto = urlFoto(reporte.foto_path);
-  const color = reporte.categoria?.color ?? "#475569";
-
-  // El primer paso no existe en la base de datos: es la creación del reporte
-  const historial = [
-    { id: "creado", estado: "pendiente", comentario: "Reporte recibido", created_at: reporte.created_at },
-    ...reporte.historial,
-  ];
+  const color = reporte.categoria?.color ?? COLOR_SIN_CATEGORIA;
 
   return (
     <article className="space-y-4 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
@@ -177,28 +168,12 @@ function ResultadoFolio({ reporte }) {
         </p>
       )}
 
-      <section className="border-t border-slate-200 pt-4">
-        <h3 className="mb-3 text-sm font-semibold">Historial</h3>
-        <ol className="space-y-4 border-l-2 border-slate-200 pl-4">
-          {historial.map((paso) => (
-            <li key={paso.id} className="relative">
-              <span className="absolute -left-[23px] top-1 h-3 w-3 rounded-full border-2 border-white bg-slate-400" />
-              <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500">
-                <EtiquetaEstado estado={paso.estado} />
-                {formatearFecha(paso.created_at)}
-              </div>
-              {paso.comentario && (
-                <p className="mt-1 text-sm text-slate-700">
-                  {paso.id !== "creado" && (
-                    <span className="font-medium">Municipio: </span>
-                  )}
-                  {paso.comentario}
-                </p>
-              )}
-            </li>
-          ))}
-        </ol>
-      </section>
+      <HistorialReporte
+        reporte={reporte}
+        pasos={reporte.historial}
+        titulo="Historial"
+        Encabezado="h3"
+      />
     </article>
   );
 }
