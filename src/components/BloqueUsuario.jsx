@@ -34,13 +34,12 @@ export default function BloqueUsuario({ variante = "barra" }) {
             {nombre.charAt(0).toUpperCase()}
           </span>
 
-          {/* En lg el nombre y "Panel" van uno debajo del otro */}
-          {/* En celular se oculta el nombre para que quepa junto al título; solo queda la inicial */}
-          <div className="hidden min-w-0 flex-1 items-center gap-2 sm:flex lg:flex-col lg:items-start lg:gap-0">
+          {/* En celular se oculta el nombre para que quepa junto al título; solo queda la inicial.
+              El botón "Panel" de esta variante está arriba de los filtros (PanelLateral.jsx) */}
+          <div className="hidden min-w-0 flex-1 items-center gap-2 sm:flex">
             <span className="truncate font-semibold text-slate-800">
               Hola, {nombre}
             </span>
-            {/* El botón "Panel" de esta variante ahora está arriba de los filtros (PanelLateral.jsx) */}
           </div>
 
           <button

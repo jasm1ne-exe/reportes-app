@@ -21,7 +21,7 @@ export default function FormularioReporte({
   const [categoriaId, setCategoriaId] = useState("");
   const [titulo, setTitulo] = useState("");
   const [descripcion, setDescripcion] = useState("");
-  // { tipo: "error" | "exito", mensaje } o null
+  // { tipo: "error", mensaje } o null
   const [alerta, setAlerta] = useState(null);
   // false, "foto" (subiendo la imagen) o "datos" (guardando el reporte)
   const [enviando, setEnviando] = useState(false);
@@ -158,21 +158,14 @@ export default function FormularioReporte({
       .maybeSingle();
 
     setEnviando(false);
-
-    // El reporte ya se guardó; si no se pudo leer, solo no se dibuja el marcador
-    if (!data) {
-      onCerrar?.();
-      setTitulo("");
-      setDescripcion("");
-      setFoto(null);
-      return;
-    }
-
-    // El mapa cierra el formulario y avisa que se envió
-    onReporteCreado?.(data);
     setTitulo("");
     setDescripcion("");
     setFoto(null);
+
+    // El mapa cierra el formulario y avisa que se envió.
+    // El reporte ya se guardó; si no se pudo leer, solo no se dibuja el marcador.
+    if (data) onReporteCreado?.(data);
+    else onCerrar?.();
   }
 
   const aviso = alerta ?? (errorCategorias
@@ -287,14 +280,7 @@ export default function FormularioReporte({
           </p>
 
           {aviso && (
-            <div
-              role="alert"
-              className={`rounded-lg p-2 text-sm ${
-                aviso.tipo === "error"
-                  ? "bg-red-50 text-red-700"
-                  : "bg-green-50 text-green-700"
-              }`}
-            >
+            <div role="alert" className="rounded-lg bg-red-50 p-2 text-sm text-red-700">
               {aviso.mensaje}
             </div>
           )}

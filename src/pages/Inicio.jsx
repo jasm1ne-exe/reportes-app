@@ -3,7 +3,7 @@ import Mapa from "../components/Mapa";
 import PanelLateral from "../components/PanelLateral";
 import { cargarCategorias } from "../lib/reportes";
 
-// Aquí viven los datos que comparten el mapa y (más adelante) el panel lateral
+// Aquí viven los datos que comparten el mapa y el panel lateral
 export default function Inicio() {
   const [categorias, setCategorias] = useState([]);
   const [cargandoCategorias, setCargandoCategorias] = useState(true);

@@ -1,5 +1,5 @@
 import { LayoutGrid } from "lucide-react";
-import { iconoCategoria } from "../lib/iconosCategoria";
+import { COLOR_SIN_CATEGORIA, iconoCategoria } from "../lib/iconosCategoria";
 
 // Botones con el color de cada categoría: sirven de leyenda y de filtro.
 // seleccionada es el id de la categoría o null para mostrar todas.
@@ -48,7 +48,7 @@ export default function FiltroCategorias({ categorias, seleccionada, onCambiar }
           >
             <span
               className="h-2.5 w-2.5 shrink-0 rounded-full ring-1 ring-white lg:h-3 lg:w-3"
-              style={{ background: categoria.color ?? "#475569" }}
+              style={{ background: categoria.color ?? COLOR_SIN_CATEGORIA }}
             />
             {/* el ícono toma el color del texto, así se ve bien activo o no */}
             <Icono className="h-3.5 w-3.5 shrink-0 lg:h-4 lg:w-4" aria-hidden="true" />

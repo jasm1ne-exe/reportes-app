@@ -14,6 +14,13 @@ import { CircleCheck, LoaderCircle, X } from "lucide-react";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 
+//el formulario, que se muestra encima del mapa.
+import FormularioReporte from "./formularioReportes";
+import MarcadorReporte from "./MarcadorReporte";
+import ControlesMapa from "./ControlesMapa";
+import AvisoFolio from "./AvisoFolio";
+import { cargarReportesMapa } from "../lib/reportes";
+
 // Pin en forma de gota para marcar dónde se hará el reporte.
 // Es un SVG propio (ya no se usa el pin azul de Leaflet, que era grande y tapaba
 // los reportes de alrededor). La punta de la gota está en (14, 36) del viewBox;
@@ -30,12 +37,6 @@ const PIN_UBICACION = L.divIcon({
   // el popup sale arriba de la gota
   popupAnchor: [0, -30],
 });
-//el formulario, que se muestra encima del mapa.
-import FormularioReporte from "./formularioReportes";
-import MarcadorReporte from "./MarcadorReporte";
-import ControlesMapa from "./ControlesMapa";
-import AvisoFolio from "./AvisoFolio";
-import { cargarReportesMapa } from "../lib/reportes";
 
 // Coordenadas de magdalena, Jalisco, México. Se usan mientras llega la ubicacion real o si falla.
 const DEFAULT_POSITION = [20.9086744, -103.9815141];
@@ -92,7 +93,6 @@ function SelectorUbicacion({ activo, onSeleccionar }) {
 function Aviso({ tono = "info", children }) {
   const tonos = {
     info: "bg-white text-slate-700",
-    exito: "bg-green-600 text-white",
     alerta: "bg-amber-50 text-amber-800",
     error: "bg-red-50 text-red-700",
   };
@@ -135,8 +135,8 @@ export default function MapView({
   const [errorReportes, setErrorReportes] = useState(false);
   // id del reporte recién creado, para abrir su popup
   const [reporteNuevoId, setReporteNuevoId] = useState(null);
-  // false = sin aviso, true = aviso corto, o el folio del reporte (ej: "MGD-0007")
-  const [mensajeExito, setMensajeExito] = useState(false);
+  // null = sin aviso, o el folio del reporte recién enviado (ej: "MGD-0007")
+  const [folioEnviado, setFolioEnviado] = useState(null);
   const temporizadores = useRef([]);
 
   // Ejecuta una función después de unos segundos; se cancela al desmontar
@@ -178,13 +178,9 @@ export default function MapView({
     setReporteNuevoId(reporte.id);
     onCambiarFiltro(null);
     onCambiarFormAbierto(false);
-    if (reporte.folio) {
-      // Con folio el aviso se queda hasta que el usuario lo cierre
-      setMensajeExito(reporte.folio);
-    } else {
-      setMensajeExito(true);
-      despues(4000, () => setMensajeExito(false));
-    }
+    // Todos los reportes tienen folio (lo pone la base de datos).
+    // El aviso se queda hasta que el usuario lo cierre.
+    setFolioEnviado(reporte.folio);
   };
 
   const seleccionarUbicacion = (nueva) => {
@@ -294,8 +290,8 @@ export default function MapView({
             {moved
               ? "Ubicación seleccionada"
               : status === "success"
-              ? "Ubicación actual del dispositivo. Puedes arrastrar el marcador para ajustar la ubicación" 
-              :" Ubicación predeterminada (Magdalena, Jalisco, México). Puedes arrastrar el marcador para ajustar la ubicación  "}
+              ? "Ubicación actual del dispositivo. Puedes arrastrar el marcador para ajustar la ubicación"
+              : "Ubicación predeterminada (Magdalena, Jalisco, México). Puedes arrastrar el marcador para ajustar la ubicación"}
           </Popup>
         </Marker>
       </MapContainer>
@@ -349,18 +345,11 @@ export default function MapView({
           <Aviso tono="error">No se pudieron cargar los reportes.</Aviso>
         )}
 
-        {typeof mensajeExito === "string" && !formAbierto && (
+        {folioEnviado && !formAbierto && (
           <AvisoFolio
-            folio={mensajeExito}
-            onCerrar={() => setMensajeExito(false)}
+            folio={folioEnviado}
+            onCerrar={() => setFolioEnviado(null)}
           />
-        )}
-
-        {mensajeExito === true && (
-          <Aviso tono="exito">
-            <CircleCheck className="h-3.5 w-3.5" />
-            ¡Reporte enviado! Gracias.
-          </Aviso>
         )}
       </div>
 
