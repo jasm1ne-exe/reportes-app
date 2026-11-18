@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import {
   MapContainer,
   TileLayer,
+  LayersControl,
   Marker,
   Popup,
   useMap,
@@ -18,6 +19,7 @@ import L from "leaflet";
 import FormularioReporte from "./formularioReportes";
 import MarcadorReporte from "./MarcadorReporte";
 import ControlesMapa from "./ControlesMapa";
+import CapaVectorial from "./CapaVectorial";
 import AvisoFolio from "./AvisoFolio";
 import { cargarReportesMapa } from "../lib/reportes";
 
@@ -37,6 +39,10 @@ const PIN_UBICACION = L.divIcon({
   // el popup sale arriba de la gota
   popupAnchor: [0, -30],
 });
+
+// Créditos que pide OpenFreeMap; se usan en las capas Calles y Claro
+const CREDITOS_OPENFREEMAP =
+  '<a href="https://openfreemap.org">OpenFreeMap</a> &copy; <a href="https://www.openmaptiles.org/">OpenMapTiles</a> Datos de &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>';
 
 // Coordenadas de magdalena, Jalisco, México. Se usan mientras llega la ubicacion real o si falla.
 const DEFAULT_POSITION = [20.9086744, -103.9815141];
@@ -251,10 +257,34 @@ export default function MapView({
         zoomControl={false}
         className="h-full w-full"
       >
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
+        {/* Selector de mapa base. Va arriba a la derecha porque los avisos se pegan a la izquierda.
+            Calles y Claro son mapas vectoriales de OpenFreeMap (gratis, sin clave y nítidos en
+            cualquier zoom). Claro es el inicial porque ahí resaltan más los reportes. */}
+        <LayersControl position="topright">
+          <LayersControl.BaseLayer name="Calles">
+            {/* Colorido y con más detalle (tiendas, escuelas...) para ubicarse mejor */}
+            <CapaVectorial
+              style="https://tiles.openfreemap.org/styles/liberty"
+              attribution={CREDITOS_OPENFREEMAP}
+            />
+          </LayersControl.BaseLayer>
+          <LayersControl.BaseLayer checked name="Claro">
+            <CapaVectorial
+              style="https://tiles.openfreemap.org/styles/positron"
+              attribution={CREDITOS_OPENFREEMAP}
+            />
+          </LayersControl.BaseLayer>
+          <LayersControl.BaseLayer name="Satélite">
+            <TileLayer
+              attribution="Tiles &copy; Esri &mdash; Source: Esri, Maxar, Earthstar Geographics, and the GIS User Community"
+              url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+              maxZoom={19}
+              // En Magdalena solo hay fotos hasta el zoom 18; más cerca se agranda la del 18
+              // (si no, el servidor manda la imagen "Map data not yet available")
+              maxNativeZoom={18}
+            />
+          </LayersControl.BaseLayer>
+        </LayersControl>
         {/* GPS y +/−; van aquí dentro porque usan useMap() */}
         <ControlesMapa
           onGps={reintentarUbicacion}
