@@ -16,7 +16,7 @@ El proyecto está pensado inicialmente para **Magdalena, Jalisco (México)**, au
 
 **Disponibles**
 
-- Mapa interactivo (OpenStreetMap + Leaflet) centrado en la ubicación del dispositivo, con un punto predeterminado si no se concede el permiso, y botón **GPS** para volver a buscar la ubicación.
+- Mapa interactivo (Leaflet) con tres mapas base a elegir: **Claro** y **Calles** (OpenFreeMap) y **Satélite** (Esri), centrado en la ubicación del dispositivo, con un punto predeterminado si no se concede el permiso, y botón **GPS** para volver a buscar la ubicación.
 - Marcador que se puede arrastrar (o tocar el mapa) para ajustar la ubicación exacta del problema.
 - Formulario de reporte con categoría, título, descripción y **foto opcional**.
 - Cada reporte recibe un **folio de seguimiento** (por ejemplo `MGD-0007`) que se puede copiar al enviarlo.
@@ -41,7 +41,7 @@ El proyecto está pensado inicialmente para **Magdalena, Jalisco (México)**, au
 
 - [React 19](https://react.dev/) + [Vite](https://vite.dev/)
 - [Tailwind CSS 4](https://tailwindcss.com/)
-- [Leaflet](https://leafletjs.com/) y React-Leaflet con mapas de OpenStreetMap
+- [Leaflet](https://leafletjs.com/) y React-Leaflet, con mapas vectoriales de [OpenFreeMap](https://openfreemap.org/) (dibujados con [MapLibre](https://maplibre.org/)) y fotos satelitales de Esri
 - [Supabase](https://supabase.com/) (autenticación, base de datos y almacenamiento de imágenes)
 - React Router
 - browser-image-compression
